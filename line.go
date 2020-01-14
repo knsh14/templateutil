@@ -22,7 +22,7 @@ func Line(root, target parse.Node) (int, error) {
 		if n == nil {
 			return false
 		}
-		if target.Position() > n.Position() {
+		if target.Position() <= n.Position() {
 			return true
 		}
 		if tn, ok := n.(*parse.TextNode); ok {

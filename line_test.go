@@ -7,53 +7,46 @@ import (
 )
 
 func TestLine(t *testing.T) {
-	tpl := `this is {{ println "template" }}
+	testcases := []struct {
+		title string
+		tpl   string
+		line  int
+	}{
+		{
+			title: "normal",
+			tpl: `this is {{ println "template" }}
     hogehuga{{ println }}
-`
-	tmpl, err := template.New("Ident").Parse(tpl)
-	if err != nil {
-		t.Fatalf("parsing template %s", err)
-	}
-	l, err := Line(tmpl.Tree.Root, tmpl.Tree.Root.Nodes[len(tmpl.Tree.Root.Nodes)-2])
-	if err != nil {
-		t.Fatal(err)
-	}
-	expected := 1
-	if l != expected {
-		t.Errorf("result=%d != expected=%d", l, expected)
-	}
-}
+`,
+			line: 1,
+		},
+		{
+			title: "oneline",
+			tpl:   `this is {{ println "template" }}hogehuga{{ println }}`,
+			line:  0,
+		},
+		{
+			title: "double newline",
+			tpl: `this is {{ println "template" }}
 
-func TestLine_NoLine(t *testing.T) {
-	tpl := `this is {{ println "template" }}hogehuga{{ println }}`
-	tmpl, err := template.New("Ident").Parse(tpl)
-	if err != nil {
-		t.Fatalf("parsing template %s", err)
+    hogehuga{{ println }}`,
+			line: 2,
+		},
 	}
-	l, err := Line(tmpl.Tree.Root, tmpl.Tree.Root.Nodes[len(tmpl.Tree.Root.Nodes)-2])
-	if err != nil {
-		t.Fatal(err)
-	}
-	expected := 0
-	if l != expected {
-		t.Errorf("result=%d != expected=%d", l, expected)
-	}
-}
-func TestLine_TwoNewLine(t *testing.T) {
-	tpl := `this is {{ println "template" }}
-
-hogehuga{{ println }}`
-	tmpl, err := template.New("Ident").Parse(tpl)
-	if err != nil {
-		t.Fatalf("parsing template %s", err)
-	}
-	l, err := Line(tmpl.Tree.Root, tmpl.Tree.Root.Nodes[len(tmpl.Tree.Root.Nodes)-2])
-	if err != nil {
-		t.Fatal(err)
-	}
-	expected := 2
-	if l != expected {
-		t.Errorf("result=%d != expected=%d", l, expected)
+	for _, tc := range testcases {
+		t.Run(tc.title, func(t *testing.T) {
+			tmpl, err := template.New("Ident").Parse(tc.tpl)
+			if err != nil {
+				t.Fatalf("parsing template %s", err)
+			}
+			t.Log(tmpl.Tree.Root.Nodes[len(tmpl.Tree.Root.Nodes)-1])
+			l, err := Line(tmpl.Tree.Root, tmpl.Tree.Root.Nodes[len(tmpl.Tree.Root.Nodes)-1])
+			if err != nil {
+				t.Fatal(err)
+			}
+			if l != tc.line {
+				t.Errorf("result=%d != expected=%d", l, tc.line)
+			}
+		})
 	}
 }
 
@@ -64,7 +57,6 @@ func TestLine_NoText(t *testing.T) {
 		t.Fatalf("parsing template %s", err)
 	}
 	_, err = Line(tmpl.Tree.Root, nil)
-	t.Log(err)
 	if err == nil {
 		t.Fatal("expected error but no")
 	}
