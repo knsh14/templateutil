@@ -31,7 +31,7 @@ func Line(root, target parse.Node) (int, error) {
 			}
 		}
 		if tn, ok := n.(*parse.StringNode); ok {
-			if strings.Contains(string(tn.Text), "\n") {
+			if strings.Contains(tn.Text, "\n") {
 				line++
 			}
 		}
