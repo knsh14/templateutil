@@ -26,14 +26,10 @@ func Line(root, target parse.Node) (int, error) {
 			return true
 		}
 		if tn, ok := n.(*parse.TextNode); ok {
-			if strings.Contains(string(tn.Text), "\n") {
-				line++
-			}
+			line += strings.Count(string(tn.Text), "\n")
 		}
 		if tn, ok := n.(*parse.StringNode); ok {
-			if strings.Contains(tn.Text, "\n") {
-				line++
-			}
+			line += strings.Count(tn.Text, "\n")
 		}
 		return true
 	})
