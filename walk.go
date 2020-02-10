@@ -20,7 +20,9 @@ func Walk(node parse.Node, f Visitor) {
 	case *parse.BranchNode:
 		Walk(n.Pipe, f)
 		Walk(n.List, f)
-		Walk(n.ElseList, f)
+		if n.ElseList != nil {
+			Walk(n.ElseList, f)
+		}
 	case *parse.ChainNode:
 		Walk(n.Node, f)
 	case *parse.CommandNode:
@@ -33,7 +35,9 @@ func Walk(node parse.Node, f Visitor) {
 	case *parse.IfNode:
 		Walk(n.Pipe, f)
 		Walk(n.List, f)
-		Walk(n.ElseList, f)
+		if n.ElseList != nil {
+			Walk(n.ElseList, f)
+		}
 	case *parse.ListNode:
 		for _, nn := range n.Nodes {
 			Walk(nn, f)
@@ -50,16 +54,22 @@ func Walk(node parse.Node, f Visitor) {
 	case *parse.RangeNode:
 		Walk(n.Pipe, f)
 		Walk(n.List, f)
-		Walk(n.ElseList, f)
+		if n.ElseList != nil {
+			Walk(n.ElseList, f)
+		}
 	case *parse.StringNode:
 	case *parse.TemplateNode:
-		Walk(n.Pipe, f)
+		if n.Pipe != nil {
+			Walk(n.Pipe, f)
+		}
 	case *parse.TextNode:
 	case *parse.VariableNode:
 	case *parse.WithNode:
 		Walk(n.Pipe, f)
 		Walk(n.List, f)
-		Walk(n.ElseList, f)
+		if n.ElseList != nil {
+			Walk(n.ElseList, f)
+		}
 	default:
 		panic(fmt.Sprintf("template.Walk: unexpected node type %T", n))
 	}
